@@ -19,18 +19,10 @@ public class ViewModel_Users extends AndroidViewModel {
 
     private LiveData<List<POJO_Users>> mAllUsers;
 
-    private POJO_Users mLastUser;
-
     public ViewModel_Users(@NonNull Application application) {
         super(application);
         mRepository = new Repository_Users(application);
         mAllUsers = mRepository.getAllUsers();
-        mLastUser = mRepository.getLastUser();
-    }
-
-    POJO_Users getmLastUaer()
-    {
-        return mLastUser;
     }
 
     LiveData<List<POJO_Users>> getAllUsers() {

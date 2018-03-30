@@ -56,14 +56,6 @@ public class RV_Adapter_UsersList extends RecyclerView.Adapter {
         mUsers =new  ArrayList<POJO_Users>();
     }
 
-    void addListUsers(ArrayList<POJO_Users> al)
-    {
-        for(int i=0;i<al.size();i++)
-        {
-            addUser(al.get(i));
-        }
-    }
-
     public void addUser(POJO_Users m)
     {
         mUsers.add(m);
@@ -97,4 +89,7 @@ public class RV_Adapter_UsersList extends RecyclerView.Adapter {
     public int getItemCount() {
         return mUsers.size();
     }
+
+
+
 }

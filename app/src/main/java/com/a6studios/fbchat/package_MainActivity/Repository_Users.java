@@ -13,22 +13,18 @@ import java.util.List;
 public class Repository_Users {
     private DAO_Users mDAO_Users;
     private LiveData<List<POJO_Users>> mAllUsers;
-    private POJO_Users lastUser;
 
     Repository_Users(Application application) {
         Database_Users db = Database_Users.getDatabase(application);
         mDAO_Users = db.dao_users();
         mAllUsers = mDAO_Users.getAllUsers();
-        lastUser = mDAO_Users.getLastUser();
     }
 
     LiveData<List<POJO_Users>> getAllUsers() {
         return mAllUsers;
     }
 
-    public POJO_Users getLastUser(){
-        return lastUser;
-    }
+
 
     public void insert (POJO_Users user) {
         new insertAsyncTaskROOM(mDAO_Users).execute(user);

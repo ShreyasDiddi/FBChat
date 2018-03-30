@@ -80,13 +80,18 @@ public class MainActivity extends AppCompatActivity {
         //Getting Multiple documents:
 
         mViewModel = ViewModelProviders.of(this).get(ViewModel_Users.class);
-        mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
+       /* mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
             @Override
             public void onChanged(@Nullable List<POJO_Users> pojo_users) {
-                for(POJO_Users u :pojo_users)
-                     mAdapter.addUser(u);
+                RV_Adapter_UsersList adapter_usersList = new RV_Adapter_UsersList(getApplicationContext());
+                for(int i =0;i<pojo_users.size();i++)
+                {
+                    adapter_usersList.addUser(pojo_users.get(i));
+                }
+                rvUsers.swapAdapter(adapter_usersList,true);
             }
-        });
+
+        });*/
     }
 
     public void onStart() {
@@ -103,11 +108,22 @@ public class MainActivity extends AppCompatActivity {
         {
             fdb = FirestoreDataBase.getFirestoreDatabase();
 
-            POJO_Users lastUser = mViewModel.getmLastUaer();
+            fdb.setmQuery(fdb.getDb().collection("reged_users").orderBy("UID"));
 
-            fdb.setmQuery(fdb.getDb().collection("reged_users").orderBy("UID").startAfter(lastUser));
+            fdb.setmListenerRegistration(mViewModel);
 
-            fdb.getRegedUsersList(mViewModel);
+            mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
+                @Override
+                public void onChanged(@Nullable List<POJO_Users> pojo_users) {
+                    RV_Adapter_UsersList adapter_usersList = new RV_Adapter_UsersList(getApplicationContext());
+                    for(int i =0;i<pojo_users.size();i++)
+                    {
+                        adapter_usersList.addUser(pojo_users.get(i));
+                    }
+                    rvUsers.swapAdapter(adapter_usersList,true);
+                }
+
+            });
 
         }
     }

@@ -140,8 +140,7 @@ public class FirestoreDataBase {
                 for (DocumentChange dc :documentSnapshots.getDocumentChanges()){
                     i++;
                     POJO_Users u = dc.getDocument().toObject(POJO_Users.class);
-                        vm.insert(u);
-
+                    vm.insert(u);
                 }
             }
         });

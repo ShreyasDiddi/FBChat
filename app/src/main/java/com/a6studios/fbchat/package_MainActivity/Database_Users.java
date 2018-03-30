@@ -12,7 +12,7 @@ import android.support.annotation.NonNull;
  * Created by HP on 3/30/2018.
  */
 
-@Database(entities = {POJO_Users.class}, version = 1)
+@Database(entities = {POJO_Users.class}, version = 1,exportSchema = false)
 public abstract class Database_Users extends RoomDatabase {
     public abstract DAO_Users dao_users();
 
