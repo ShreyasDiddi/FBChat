@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable List<POJO_Users> pojo_users) {
                 for(POJO_Users u :pojo_users)
-                    mAdapter.addUser(u);
+                     mAdapter.addUser(u);
             }
         });
     }
