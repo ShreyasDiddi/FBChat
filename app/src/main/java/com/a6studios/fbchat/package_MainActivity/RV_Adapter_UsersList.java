@@ -15,6 +15,7 @@ import com.a6studios.fbchat.package_OTPVerifiation.POJO_User;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by HP on 3/22/2018.
@@ -67,6 +68,12 @@ public class RV_Adapter_UsersList extends RecyclerView.Adapter {
     {
         mUsers.add(m);
         notifyItemInserted(mUsers.size()-1);
+    }
+
+
+    public void setAllUsers (ArrayList<POJO_Users> listUsers){
+        mUsers = listUsers;
+        notifyDataSetChanged();
     }
 
     @Override

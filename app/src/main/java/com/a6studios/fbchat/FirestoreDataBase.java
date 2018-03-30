@@ -1,22 +1,17 @@
 package com.a6studios.fbchat;
 
-import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.ProgressBar;
 
 import com.a6studios.fbchat.package_MainActivity.POJO_Users;
 import com.a6studios.fbchat.package_MainActivity.RV_Adapter_UsersList;
+import com.a6studios.fbchat.package_MainActivity.ViewModel_Users;
 import com.a6studios.fbchat.package_OTPVerifiation.POJO_User;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,7 +22,6 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -41,10 +35,17 @@ public class FirestoreDataBase {
     private static FirebaseUser firebaseUser;
     private static String UserId ;
     private static Query mQuery;
+    private static int count_firebase_reged_users;
+    private static int count_room_reged_users;
+
+    public static int getCount_firebase_reged_users() {
+        return count_firebase_reged_users;
+    }
+
+
     private static ListenerRegistration mListenerRegistration;
     private static final String rUsers = "reged_users";
     private static final String TAG = "MY FiREBASE ERROR";
-
 
 
     FirestoreDataBase()
@@ -62,6 +63,7 @@ public class FirestoreDataBase {
         }
     }
 
+
     public static FirestoreDataBase getFirestoreDatabase()
     {
         if(mFirestoreDatabase==null)
@@ -74,7 +76,7 @@ public class FirestoreDataBase {
         return mFirestoreDatabase;
     }
 
-    public void getRegedUsersList(final RV_Adapter_UsersList mAdapter)
+    public void getRegedUsersList(final ViewModel_Users viewModel_users)
     {
         db.collection("reged_users")
                 .get()
@@ -86,8 +88,7 @@ public class FirestoreDataBase {
                                 POJO_Users u = document.toObject(POJO_Users.class);
                                 FirestoreDataBase fdb = FirestoreDataBase.getFirestoreDatabase();
                                 String name = fdb.getFirebaseUser().getDisplayName();
-                                if(u.getUID().compareTo(firebaseUser.getUid())!=0)
-                                    mAdapter.addUser(u);
+                                viewModel_users.insert(u);
                             }
                         } else {
                             Log.d("ERROR", "Error getting documents: ", task.getException());
@@ -115,6 +116,7 @@ public class FirestoreDataBase {
         m.put("name",u.getName());
         m.put("UID",u.getUID());
         db.collection(rUsers).document(getUserId()).set(m);
+
     }
 
     public Query getmQuery() {
@@ -129,7 +131,7 @@ public class FirestoreDataBase {
         return mListenerRegistration;
     }
 
-    public void setmListenerRegistration (final RV_Adapter_UsersList mAdapter)
+    public void setmListenerRegistration (final ViewModel_Users vm)
     {
         mListenerRegistration = mQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
             int i = 0;
@@ -138,12 +140,12 @@ public class FirestoreDataBase {
                 for (DocumentChange dc :documentSnapshots.getDocumentChanges()){
                     i++;
                     POJO_Users u = dc.getDocument().toObject(POJO_Users.class);
-                    if(u.getUID().compareTo(firebaseUser.getUid())!=0)
-                        mAdapter.addUser(u);
+                        vm.insert(u);
 
                 }
             }
         });
+
     }
 
     public void unregisterListnerRegistertion()

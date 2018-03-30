@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.a6studios.fbchat.FirestoreDataBase;
 import com.a6studios.fbchat.R;
 import com.a6studios.fbchat.package_MainActivity.MainActivity;
 
@@ -56,13 +55,4 @@ public class ChatBox extends AppCompatActivity {
         startActivity(i);
         finish();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        FirestoreDataBase fdb = FirestoreDataBase.getFirestoreDatabase();
-        fdb.unregisterListnerRegistertion();
-        FirestoreDataBase.cleanUp();
-    }
-
 }

@@ -1,10 +1,15 @@
 package com.a6studios.fbchat.package_MainActivity;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -48,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rvUsers;
     FirestoreDataBase fdb;
     RV_Adapter_UsersList mAdapter,mLiveAdapter;
+    private ViewModel_Users mViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,6 +78,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });*/
         //Getting Multiple documents:
+
+        mViewModel = ViewModelProviders.of(this).get(ViewModel_Users.class);
+        mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
+            @Override
+            public void onChanged(@Nullable List<POJO_Users> pojo_users) {
+                for(POJO_Users u :pojo_users)
+                    mAdapter.addUser(u);
+            }
+        });
     }
 
     public void onStart() {
@@ -88,14 +103,16 @@ public class MainActivity extends AppCompatActivity {
         {
             fdb = FirestoreDataBase.getFirestoreDatabase();
 
-            fdb.setmQuery(fdb.getDb().collection("reged_users").orderBy("name"));
+            POJO_Users lastUser = mViewModel.getmLastUaer();
 
-            fdb.getRegedUsersList(mAdapter);
+            fdb.setmQuery(fdb.getDb().collection("reged_users").orderBy("UID").startAfter(lastUser));
+
+            fdb.getRegedUsersList(mViewModel);
 
         }
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
         fdb.setmListenerRegistration(mLiveAdapter);
@@ -107,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
     }
-
+*/
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -117,10 +134,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClick(View view) {
+
         FirebaseAuth.getInstance().signOut();
         fdb.unregisterListnerRegistertion();
-        onStart();
+        Intent i = new Intent(this,MainActivity.class);
+        startActivity(i);
+        finish();
+
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
 
+    }
 }

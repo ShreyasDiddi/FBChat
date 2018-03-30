@@ -1,15 +1,23 @@
 package com.a6studios.fbchat.package_MainActivity;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
+
 import com.google.firebase.auth.FirebaseUser;
 
 /**
  * Created by HP on 3/20/2018.
  */
-
+@Entity(tableName = "users")
 public class POJO_Users {
-    private String name;
-    private String UID;
-
+    @PrimaryKey
+    @NonNull
+    private String UID="";
+    @NonNull
+    private String name="";
     public String getUID() {
         return UID;
     }
