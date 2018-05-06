@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView rvUsers;
     FirestoreDataBase fdb;
     RV_Adapter_UsersList mAdapter,mLiveAdapter;
-    private ViewModel_Users mViewModel;
+    ViewModel_Users mViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         fdb = FirestoreDataBase.getFirestoreDatabase();
         /*//Getting one single document
 
+
         CollectionReference users = FirebaseFirestore.getInstance().collection("reged_users");
         DocumentReference docRef = users.document("A6qCmCfOiihJeiFBgj4tJQ9r2Ow2");
         docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -80,18 +81,14 @@ public class MainActivity extends AppCompatActivity {
         //Getting Multiple documents:
 
         mViewModel = ViewModelProviders.of(this).get(ViewModel_Users.class);
-       /* mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
+        mViewModel.setListenerUsers();
+        mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
             @Override
             public void onChanged(@Nullable List<POJO_Users> pojo_users) {
-                RV_Adapter_UsersList adapter_usersList = new RV_Adapter_UsersList(getApplicationContext());
-                for(int i =0;i<pojo_users.size();i++)
-                {
-                    adapter_usersList.addUser(pojo_users.get(i));
-                }
-                rvUsers.swapAdapter(adapter_usersList,true);
+                mAdapter.setAllUsers(pojo_users);
             }
 
-        });*/
+        });
     }
 
     public void onStart() {
@@ -107,61 +104,24 @@ public class MainActivity extends AppCompatActivity {
         else
         {
             fdb = FirestoreDataBase.getFirestoreDatabase();
-
-            fdb.setmQuery(fdb.getDb().collection("reged_users").orderBy("UID"));
-
-            fdb.setmListenerRegistration(mViewModel);
-
-            mViewModel.getAllUsers().observe(this, new Observer<List<POJO_Users>>() {
-                @Override
-                public void onChanged(@Nullable List<POJO_Users> pojo_users) {
-                    RV_Adapter_UsersList adapter_usersList = new RV_Adapter_UsersList(getApplicationContext());
-                    for(int i =0;i<pojo_users.size();i++)
-                    {
-                        adapter_usersList.addUser(pojo_users.get(i));
-                    }
-                    rvUsers.swapAdapter(adapter_usersList,true);
-                }
-
-            });
-
         }
     }
 
-    /*@Override
-    protected void onResume() {
-        super.onResume();
-        fdb.setmListenerRegistration(mLiveAdapter);
-        rvUsers.swapAdapter(mLiveAdapter,true);
-
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-*/
     @Override
     protected void onDestroy() {
         super.onDestroy();
         fdb = FirestoreDataBase.getFirestoreDatabase();
-        fdb.unregisterListnerRegistertion();
         FirestoreDataBase.cleanUp();
     }
 
     public void onClick(View view) {
 
         FirebaseAuth.getInstance().signOut();
-        fdb.unregisterListnerRegistertion();
+        FirestoreDataBase.cleanUp();
         Intent i = new Intent(this,MainActivity.class);
         startActivity(i);
         finish();
 
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-    }
 }

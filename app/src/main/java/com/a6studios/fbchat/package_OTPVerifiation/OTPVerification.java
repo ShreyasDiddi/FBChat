@@ -75,8 +75,6 @@ public class OTPVerification extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         FirestoreDataBase fdb = FirestoreDataBase.getFirestoreDatabase();
-        fdb.unregisterListnerRegistertion();
-        FirestoreDataBase.cleanUp();
     }
 
 }

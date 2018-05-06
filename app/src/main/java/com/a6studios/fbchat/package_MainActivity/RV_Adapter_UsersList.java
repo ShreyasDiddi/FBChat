@@ -24,8 +24,8 @@ import java.util.List;
 class RV_ViewHolder_UsersList extends RecyclerView.ViewHolder implements View.OnClickListener{
     TextView mUserName;
     Context mContext;
-    ArrayList<POJO_Users> al;
-    public RV_ViewHolder_UsersList(View itemView,Context c,ArrayList<POJO_Users> al) {
+    List<POJO_Users> al;
+    public RV_ViewHolder_UsersList(View itemView,Context c,List<POJO_Users> al) {
         super(itemView);
         mUserName = itemView.findViewById(R.id.rv_item_name);
         mContext = c;
@@ -47,13 +47,13 @@ class RV_ViewHolder_UsersList extends RecyclerView.ViewHolder implements View.On
 
 public class RV_Adapter_UsersList extends RecyclerView.Adapter {
 
-    ArrayList<POJO_Users>  mUsers;
+    List<POJO_Users>  mUsers;
     private Context mContext;
 
     public RV_Adapter_UsersList(Context context)
     {
         mContext = context;
-        mUsers =new  ArrayList<POJO_Users>();
+        mUsers =new ArrayList<POJO_Users>();
     }
 
     public void addUser(POJO_Users m)
@@ -63,7 +63,7 @@ public class RV_Adapter_UsersList extends RecyclerView.Adapter {
     }
 
 
-    public void setAllUsers (ArrayList<POJO_Users> listUsers){
+    public void setAllUsers (List<POJO_Users> listUsers){
         mUsers = listUsers;
         notifyDataSetChanged();
     }

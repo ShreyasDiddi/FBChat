@@ -33,4 +33,9 @@ public class ViewModel_Users extends AndroidViewModel {
     {
         mRepository.insert(user);
     }
+
+    public void setListenerUsers()
+    {
+        mRepository.setListenerUsers();
+    }
 }

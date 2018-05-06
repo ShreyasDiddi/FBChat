@@ -4,6 +4,8 @@ import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 
+import com.a6studios.fbchat.FirestoreDataBase;
+
 import java.util.List;
 
 /**
@@ -13,11 +15,13 @@ import java.util.List;
 public class Repository_Users {
     private DAO_Users mDAO_Users;
     private LiveData<List<POJO_Users>> mAllUsers;
+    private FirestoreDataBase firestoreDataBase;
 
     Repository_Users(Application application) {
         Database_Users db = Database_Users.getDatabase(application);
         mDAO_Users = db.dao_users();
-        mAllUsers = mDAO_Users.getAllUsers();
+        firestoreDataBase = FirestoreDataBase.getFirestoreDatabase();
+        mAllUsers = mDAO_Users.getAllUsers(firestoreDataBase.getUserId());
     }
 
     LiveData<List<POJO_Users>> getAllUsers() {
@@ -43,5 +47,10 @@ public class Repository_Users {
             mAsyncTaskDao.insert(params[0]);
             return null;
         }
+    }
+
+    public void setListenerUsers()
+    {
+        firestoreDataBase.setLr_usersList(this);
     }
 }

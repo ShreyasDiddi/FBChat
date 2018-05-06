@@ -19,12 +19,9 @@ public interface DAO_Users {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public void insert(POJO_Users pojo_users);
 
-    @Query("select * from users order by UID ASC")
-    LiveData<List<POJO_Users>> getAllUsers();
+    @Query("select * from users where UID != :uid order by UID ASC")
+    LiveData<List<POJO_Users>> getAllUsers(String uid);
 
     @Query("select * from users order by UID DESC limit 1")
     POJO_Users getLastUser();
-
-
-
 }

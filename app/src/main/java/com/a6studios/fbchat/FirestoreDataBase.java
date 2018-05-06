@@ -3,14 +3,19 @@ package com.a6studios.fbchat;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.a6studios.fbchat.package_ChatBox.POJO_Message;
+import com.a6studios.fbchat.package_ChatBox.Repository_Messages;
+import com.a6studios.fbchat.package_ChatBox.ViewModel_Message;
 import com.a6studios.fbchat.package_MainActivity.POJO_Users;
 import com.a6studios.fbchat.package_MainActivity.RV_Adapter_UsersList;
+import com.a6studios.fbchat.package_MainActivity.Repository_Users;
 import com.a6studios.fbchat.package_MainActivity.ViewModel_Users;
 import com.a6studios.fbchat.package_OTPVerifiation.POJO_User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -30,22 +35,32 @@ import java.util.HashMap;
 
 public class FirestoreDataBase {
     public static FirestoreDataBase mFirestoreDatabase;
+
     private static FirebaseFirestore db;
+
     private static FirebaseFirestoreSettings settings;
+
     private static FirebaseUser firebaseUser;
     private static String UserId ;
-    private static Query mQuery;
-    private static int count_firebase_reged_users;
-    private static int count_room_reged_users;
+    private String toUID;
 
-    public static int getCount_firebase_reged_users() {
-        return count_firebase_reged_users;
+    public String getToUID() {
+        return toUID;
     }
 
+    public void setToUID(String toUID) {
+        this.toUID = toUID;
+    }
 
-    private static ListenerRegistration mListenerRegistration;
-    private static final String rUsers = "reged_users";
-    private static final String TAG = "MY FiREBASE ERROR";
+    private static Query q_usersList;
+    private static Query q_messageList;
+
+    private static ListenerRegistration lr_usersList;
+    private static ListenerRegistration lr_messageList;
+
+    private String collection_name;
+
+    private static final String rUsers = "reged_users";;
 
 
     FirestoreDataBase()
@@ -54,15 +69,18 @@ public class FirestoreDataBase {
             throw new RuntimeException("Use getFireStoreDataBase() method");
         else {
             db = FirebaseFirestore.getInstance();
+
             settings = new FirebaseFirestoreSettings.Builder()
                     .setPersistenceEnabled(true)
                     .build();
             db.setFirestoreSettings(settings);
+
             firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-                UserId = FirebaseAuth.getInstance().getUid();
+            UserId = FirebaseAuth.getInstance().getUid();
+            lr_messageList = null;
+            q_usersList = db.collection(rUsers);
         }
     }
-
 
     public static FirestoreDataBase getFirestoreDatabase()
     {
@@ -71,44 +89,11 @@ public class FirestoreDataBase {
         return mFirestoreDatabase;
     }
 
-
-    public  FirestoreDataBase getmFirestoreDatabase() {
-        return mFirestoreDatabase;
-    }
-
-    public void getRegedUsersList(final ViewModel_Users viewModel_users)
-    {
-        db.collection("reged_users")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot document : task.getResult()) {
-                                POJO_Users u = document.toObject(POJO_Users.class);
-                                FirestoreDataBase fdb = FirestoreDataBase.getFirestoreDatabase();
-                                String name = fdb.getFirebaseUser().getDisplayName();
-                                viewModel_users.insert(u);
-                            }
-                        } else {
-                            Log.d("ERROR", "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-    }
-
-    public  FirebaseFirestore getDb() {
-        return db;
-    }
-
-    public  FirebaseUser getFirebaseUser() {
-        return firebaseUser;
-    }
-
-
     public String getUserId() {
         return UserId;
     }
+
+    public FirebaseUser getFirebaseUser(){return firebaseUser;}
 
     public void addNewUser(POJO_User u)
     {
@@ -116,52 +101,75 @@ public class FirestoreDataBase {
         m.put("name",u.getName());
         m.put("UID",u.getUID());
         db.collection(rUsers).document(getUserId()).set(m);
-
     }
 
-    public Query getmQuery() {
-        return mQuery;
-    }
-
-    public void setmQuery(Query mQuery) {
-        FirestoreDataBase.mQuery = mQuery;
-    }
-
-    public ListenerRegistration getmListnerRegistration() {
-        return mListenerRegistration;
-    }
-
-    public void setmListenerRegistration (final ViewModel_Users vm)
+    public void setLr_usersList(final Repository_Users repository_users)
     {
-        mListenerRegistration = mQuery.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            int i = 0;
+        lr_messageList = q_usersList.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                for (DocumentChange dc :documentSnapshots.getDocumentChanges()){
-                    i++;
-                    POJO_Users u = dc.getDocument().toObject(POJO_Users.class);
-                    vm.insert(u);
+                for(DocumentChange dc : documentSnapshots.getDocumentChanges())
+                {
+                    POJO_Users mUser = dc.getDocument().toObject(POJO_Users.class);
+                    repository_users.insert(mUser);
                 }
             }
         });
+    }
+
+    public void setLr_messageList(final Repository_Messages m)
+    {
+        lr_messageList = q_messageList.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                for(DocumentChange dc :documentSnapshots.getDocumentChanges()) {
+                    m.insert(dc.getDocument().toObject(POJO_Message.class));
+                }
+            }
+        });
+    }
+
+    public void addMessage(POJO_Message m)
+    {
+        HashMap<Object,Object> hm = new HashMap<Object, Object>();
+        hm.put("ts",m.getTs());
+        hm.put("from_uid",m.getFrom_uid());
+        hm.put("to_uid",m.getTo_uid());
+        hm.put("message",m.getMessage());
+        hm.put("sent",m.isSent());
+        FirebaseFirestore.getInstance().collection("ChatBubbles").document(collection_name).collection("messages").document(m.getTs()).set(hm);
 
     }
 
-    public void unregisterListnerRegistertion()
+    public void setCr_chat(String collection_name)
     {
-       if(mListenerRegistration!=null)
-            mListenerRegistration.remove();
+        this.collection_name = collection_name;
+    }
+
+    public void setQ_messageList()
+    {
+        q_messageList = FirebaseFirestore.getInstance().collection("ChatBubbles").document(collection_name).collection("messages");
+    }
+    public void removeListner_Q_messageList()
+    {
+        lr_messageList.remove();
     }
 
     public static void cleanUp()
     {
+        if(lr_usersList!=null)
+        {
+            lr_messageList.remove();
+            lr_usersList = null;
+        }
+
         UserId = null;
         firebaseUser = null;
         db = null;
         settings=null;
         mFirestoreDatabase = null;
-        mQuery =null;
-        mListenerRegistration=null;
-    }
+        q_messageList = null;
+        q_usersList = null;
 
+    }
 }
