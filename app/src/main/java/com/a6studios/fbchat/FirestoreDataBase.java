@@ -43,7 +43,7 @@ public class FirestoreDataBase {
     private static FirebaseUser firebaseUser;
     private static String UserId ;
     private String toUID;
-    private String deleteAfterwards1;
+    private String deleteAfterwards2;
 
     public String getToUID() {
         return toUID;
