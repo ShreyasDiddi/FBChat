@@ -8,14 +8,12 @@ import android.arch.persistence.room.Query;
 
 import java.util.List;
 
-/**
- * Created by HP on 3/31/2018.
- */
+
 
 @Dao
 public interface DAO_Messages {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(POJO_Message m);
 
     @Query("select * from chat_message where to_uid = :cUID or from_uid = :cUID order by ts ASC")

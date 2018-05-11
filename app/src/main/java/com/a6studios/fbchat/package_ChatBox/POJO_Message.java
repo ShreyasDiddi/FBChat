@@ -16,10 +16,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Created by HP on 3/20/2018.
- */
+
 @Entity(tableName = "chat_message")
 public class POJO_Message {
     @PrimaryKey
@@ -27,8 +26,8 @@ public class POJO_Message {
     String ts;
     String from_uid;
     String to_uid;
-    String message;
-    boolean sent;
+    private String message;
+    private boolean sent;
 
     POJO_Message(){}
 
@@ -73,10 +72,12 @@ public class POJO_Message {
         this.sent = sent;
     }
 
+
     //custom setter
     public void setTs() {
-        SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss");
-        ts = s.format(new Date());
+        ts = TimeUnit.MICROSECONDS.toMicros(System.currentTimeMillis()) + "";
+        /*SimpleDateFormat s = new SimpleDateFormat("ddMMyyyyhhmmss");
+        ts = s.format(new Date());*/
         /*DateFormat df = DateFormat.getDateTimeInstance();
         df.setTimeZone(TimeZone.getTimeZone("gmt"));
         ts = df.format(new Date());*/

@@ -29,14 +29,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 
-/**
- * Created by HP on 3/20/2018.
- */
-
 public class FirestoreDataBase {
     public static FirestoreDataBase mFirestoreDatabase;
 
-    private static FirebaseFirestore db;
+    private  static FirebaseFirestore db;
 
     private static FirebaseFirestoreSettings settings;
 
@@ -61,7 +57,7 @@ public class FirestoreDataBase {
 
     private String collection_name;
 
-    private static final String rUsers = "reged_users";;
+    private static final String rUsers = "reged_users";
 
 
     FirestoreDataBase()
@@ -98,7 +94,7 @@ public class FirestoreDataBase {
 
     public void addNewUser(POJO_User u)
     {
-        HashMap<String,String> m = new HashMap<String, String>();
+        HashMap<String,String> m = new HashMap<>();
         m.put("name",u.getName());
         m.put("UID",u.getUID());
         db.collection(rUsers).document(getUserId()).set(m);
@@ -124,7 +120,9 @@ public class FirestoreDataBase {
             @Override
             public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
                 for(DocumentChange dc :documentSnapshots.getDocumentChanges()) {
-                    m.insert(dc.getDocument().toObject(POJO_Message.class));
+                    if(dc.getType()== DocumentChange.Type.ADDED)
+                        m.insert(dc.getDocument().toObject(POJO_Message.class));
+
                 }
             }
         });
@@ -132,7 +130,7 @@ public class FirestoreDataBase {
 
     public void addMessage(POJO_Message m)
     {
-        HashMap<Object,Object> hm = new HashMap<Object, Object>();
+        HashMap<Object,Object> hm = new HashMap<>();
         hm.put("ts",m.getTs());
         hm.put("from_uid",m.getFrom_uid());
         hm.put("to_uid",m.getTo_uid());

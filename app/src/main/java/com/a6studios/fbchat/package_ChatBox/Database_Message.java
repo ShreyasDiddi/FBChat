@@ -8,7 +8,7 @@ import android.content.Context;
 /**
  * Created by HP on 3/31/2018.
  */
-@Database(entities = {POJO_Message.class},version = 1)
+@Database(entities = {POJO_Message.class},version = 1,exportSchema = false)
 public abstract class Database_Message extends RoomDatabase {
     public abstract DAO_Messages daoMesages();
     private static Database_Message INSTANCE;

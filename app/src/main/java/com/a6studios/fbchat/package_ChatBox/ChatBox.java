@@ -26,13 +26,14 @@ import java.util.List;
 public class ChatBox extends AppCompatActivity {
     String toName;
     String toUID;
+    String s;
     TextView tv ;
     EditText msg;
     String collection_name;
     RecyclerView rvMessages;
     RV_Adapter chatAdapter;
     ViewModel_Message viewModel_message;
-     Button send;
+    Button send;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +56,9 @@ public class ChatBox extends AppCompatActivity {
             tv.setText(toName);
             String mUID = FirebaseAuth.getInstance().getUid();
             if(mUID.compareTo(toUID)<0)
-                collection_name = mUID+toUID;
+                collection_name = mUID+"|"+toUID;
             else
-                collection_name = toUID+mUID;
+                collection_name = toUID+"|"+mUID;
             FirestoreDataBase.getFirestoreDatabase().setCr_chat(collection_name);
             FirestoreDataBase.getFirestoreDatabase().setQ_messageList();
 
@@ -77,9 +78,22 @@ public class ChatBox extends AppCompatActivity {
             send.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(!msg.getText().toString().isEmpty()&!msgLength0(msg.getText().toString())) {
-                        POJO_Message m = new POJO_Message();
+                    if(!msg.getText().toString().isEmpty()&!msgLength0(s = msg.getText().toString())) {
+                        /*POJO_Message m = new POJO_Message();
                         m.setMessage(msg.getText().toString());
+                        m.setFrom_uid(FirestoreDataBase.getFirestoreDatabase().getUserId());
+                        m.setTo_uid(toUID);
+                        m.setSent();
+                        m.setTs();
+                        msg.setText("");
+
+                        FirestoreDataBase.getFirestoreDatabase().setCr_chat(collection_name);
+
+                        FirestoreDataBase.getFirestoreDatabase().addMessage(m);*/
+                        POJO_Message m = new POJO_Message();
+                        //String s = msg.getText().toString();
+                        msgLength0(s);
+                        m.setMessage(s);
                         m.setFrom_uid(FirestoreDataBase.getFirestoreDatabase().getUserId());
                         m.setTo_uid(toUID);
                         m.setSent();
@@ -100,7 +114,7 @@ public class ChatBox extends AppCompatActivity {
     boolean msgLength0(String s)
     {
         String modifieds = s.replaceAll("^\\s+","");
-        s = modifieds.replaceAll("\\s+$","");
+        this.s = modifieds.replaceAll("\\s+$","");
         return s.length()==0;
     }
 
